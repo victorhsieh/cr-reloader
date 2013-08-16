@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Crx Reloader</title>
+        <link rel="stylesheet" href="styles/bootstrap.css">
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+        <script src="app.js"></script>
+    </head>
+    <body>
+      <div class="hero-unit">
+        <h2>Crx Reloader</h2>
+         <p>
+           <button id="restart" class="btn btn-primary btn-large">Restart</button>
+           <select id="hosts">
+             <option value="127.0.0.1">lo - 127.0.0.1</option> 
+           </select>
+           <input type="text" id="port" value="24601"/>
+         </p>
+      </div>
+      <pre id="logger"></pre>
+    </body>
+</html>

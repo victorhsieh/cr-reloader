@@ -1,0 +1,15 @@
+#logger {
+  border: solid 1px #c6c6c6;
+  border-radius: 5px;
+  box-shadow: inset 0px 0px 5px #c6c6c6;
+  height: 100px;
+  overflow-y: auto;
+}
+
+select { 
+  display: block;
+}
+
+#restart {
+  margin-bottom: 9px;
+}

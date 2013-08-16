@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Crx Reloader Backend",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "To relaunch app passing from its frontend server",
+    "description": "The description of the application"
+  }
+}
