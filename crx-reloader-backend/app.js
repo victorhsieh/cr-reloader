@@ -5,7 +5,7 @@ chrome.runtime.onMessageExternal.addListener(function(req, sender, sendResponse)
   if (sender.id != ROUTER_EXTENSION_ID)
     return false;
   var id = req.path.substring(1);
-  if (!id || id == 'favicon.ico') {
+  if (!id) {
     console.log('Extension not found', id);
     sendResponse({'errorCode': 404, 'content': 'invalid id'});
     return false;

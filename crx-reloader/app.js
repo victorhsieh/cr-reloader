@@ -44,6 +44,8 @@ onload = function() {
       return "200 OK";
     else if (response.errorCode == 400)
       return "404 Not Found";
+    else if (response.errorCode == 503)
+      return "503 Service Unavailable";
     return "418 I'm a teapot";
   }
 
@@ -73,7 +75,22 @@ onload = function() {
       console.log("READ", readInfo);
       var data = arrayBufferToString(readInfo.data);
       var req = parseHTTPRequest(data);
+      if (req.path == '/favicon.ico') {
+        writeResponse(socketId, HTTPResponse({
+          'errorCode': 404,
+          'content': 'no favicon'
+        }));
+        return;
+      }
       chrome.runtime.sendMessage(CRX_RELOAD_EXTENSION_ID, req, function(response) {
+        if (!response) {
+          response = {
+            'errorCode': 503,
+            'content': 'Did you install Crx Reloader Backend?\n' +
+                       'https://chrome.google.com/webstore/detail/' +
+                       CRX_RELOAD_EXTENSION_ID
+          };
+        }
         logToScreen(response.content);
         writeResponse(socketId, HTTPResponse(response));
       });
