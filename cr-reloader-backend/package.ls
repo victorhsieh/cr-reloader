@@ -12,6 +12,10 @@ scripts:
     ./node_modules/.bin/lsc -cj package.ls
     ./node_modules/.bin/lsc -cbo lib src
   """
+  publish: """
+    rm ../cr-reloader-backend.zip
+    zip -r ../cr-reloader-backend.zip . -x 'node_modules*' 'src*' npm-debug.log '.*.swp'
+  """
 main: 'lib/app.js'
 engines:
   node: '0.8.x'
