@@ -1,0 +1,6 @@
+*.swp
+*.swo
+cr-reloader/lib
+cr-reloader/node_modules
+cr-reloader-backend/lib
+cr-reloader-backend/node_modules
