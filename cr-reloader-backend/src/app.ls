@@ -1,13 +1,13 @@
-const ROUTER_EXTENSION_ID = "gmmimkfknamjlkfclhbjojlbmiijcmgm"
+const ROUTER_EXTENSION_ID = 'gmmimkfknamjlkfclhbjojlbmiijcmgm'
 
 console.log 'Start listening'
 
 chrome.runtime.onMessageExternal.addListener (req, sender, sendResponse) ->
-  if sender.id != ROUTER_EXTENSION_ID
-    console.log 'Unrecognized sender'
+  if sender.id != ROUTER_EXTENSION_ID and localStorage['dev_mode'] !== 'true'
+    sendResponse {errorCode: 403, content: 'Forbidden'}
     return false
 
-  id = req.path.substring 1
+  id = req.pathname.substring 1
   if !id
     console.log 'Extension not found', id
     sendResponse {errorCode: 404, content: 'invalid id'}

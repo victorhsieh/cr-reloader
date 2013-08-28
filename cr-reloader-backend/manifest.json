@@ -10,5 +10,6 @@
   "background": {
     "scripts": ["lib/app.js"]
   },
+  "options_page": "options.html",
   "permissions": ["management"]
 }

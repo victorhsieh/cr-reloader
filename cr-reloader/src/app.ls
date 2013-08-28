@@ -1,3 +1,5 @@
+require! url
+
 const CRX_RELOAD_EXTENSION_ID = 'djacajifmnoecnnnpcgiilgnmobgnimn'
 
 _gel = -> document.getElementById it
@@ -31,15 +33,13 @@ window.onload = ->
     pathEnd = data.indexOf ' ', 4
     if pathEnd < 0
       return void
-    path = data.substring 4, pathEnd
-    q = path.indexOf '?'
-    if q != -1
-      path = path.substring 0, q
-    return {path: path}
+    full_url= data.substring 4, pathEnd
+    return url.parse full_url, true, true
 
   errorCodeName = (errorCode) ->
     | 200 => '200 OK'
-    | 400 => '404 Not Found'
+    | 403 => '403 Forbidden'
+    | 404 => '404 Not Found'
     | 503 => '503 Service Unavailable'
     | _ => '418 I\'m a teapot'
 
@@ -65,14 +65,15 @@ window.onload = ->
     console.log 'READ', readInfo
     data = arrayBufferToString readInfo.data
     req = parseHTTPRequest data
-    if req.path == '/favicon.ico'
+    if req.pathname == '/favicon.ico'
       writeResponse socketId, HTTPResponse({
         errorCode: 404,
         content: 'no favicon'
       })
       return
 
-    response <- chrome.runtime.sendMessage CRX_RELOAD_EXTENSION_ID, req
+    backend = req.query.backend || CRX_RELOAD_EXTENSION_ID
+    response <- chrome.runtime.sendMessage backend, req
     if !response
       response =
           errorCode: 503,

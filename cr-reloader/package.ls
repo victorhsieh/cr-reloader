@@ -11,6 +11,8 @@ scripts:
   prepublish: """
     ./node_modules/.bin/lsc -cj package.ls
     ./node_modules/.bin/lsc -cbo lib src
+    ./node_modules/.bin/browserify lib/app.js -o lib/bundle.js
+    rm -f lib/app.js
   """
   publish: """
     rm ../cr-reloader.zip
@@ -23,4 +25,5 @@ engines:
 dependencies: {}
 devDependencies:
   LiveScript: '1.1.x'
+  browserify: '2.29.x'
 optionalDependencies: {}

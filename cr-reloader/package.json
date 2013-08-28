@@ -13,7 +13,7 @@
     "url": "git://github.com/victorhsieh/crx-reloader.git"
   },
   "scripts": {
-    "prepublish": "./node_modules/.bin/lsc -cj package.ls\n./node_modules/.bin/lsc -cbo lib src",
+    "prepublish": "./node_modules/.bin/lsc -cj package.ls\n./node_modules/.bin/lsc -cbo lib src\n./node_modules/.bin/browserify lib/app.js -o lib/bundle.js\nrm -f lib/app.js",
     "publish": "rm ../cr-reloader.zip\nzip -r ../cr-reloader.zip . -x 'node_modules*' 'src*' npm-debug.log '.*.swp'"
   },
   "main": "lib/app.js",
@@ -23,7 +23,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "LiveScript": "1.1.x"
+    "LiveScript": "1.1.x",
+    "browserify": "2.29.x"
   },
   "optionalDependencies": {}
 }
