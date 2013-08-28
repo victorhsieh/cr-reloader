@@ -84,7 +84,7 @@ window.onload = ->
 
   start = ->
     _socketInfo <- socket.create 'tcp', {}
-    socketInfo = _socketInfo;
+    socketInfo := _socketInfo;
     result <- socket.listen socketInfo.socketId, host.value, parseInt(port.value), 50
     logToScreen 'LISTENING: ' + result
     socket.accept socketInfo.socketId, onAccept
