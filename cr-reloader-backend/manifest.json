@@ -11,5 +11,5 @@
     "scripts": ["lib/app.js"]
   },
   "options_page": "options.html",
-  "permissions": ["management"]
+  "permissions": ["management", "tabs"]
 }
