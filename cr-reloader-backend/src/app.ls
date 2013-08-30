@@ -5,19 +5,18 @@ console.log 'Start listening'
 reload_url = (url, sendResponse) ->
   tabs <- chrome.tabs.query {url: url}
 
-  if tabs.length != 1
-    console.log 'Matched tabs:', tabs
-    reason = if tabs.length == 0 then 'No matched url.'
-                                 else 'Please provide more specific pattern.'
+  if tabs.length == 0
     sendResponse {
-      errorCode: 429,
-      content: reason +
-               ' See http://developer.chrome.com/extensions/match_patterns.html'
+      errorCode: 404,
+      content: 'No matched url.  See ' +
+               'http://developer.chrome.com/extensions/match_patterns.html'
     }
     return
 
-  chrome.tabs.reload tabs[0].id, {}, ->
-    sendResponse {errorCode: 200, content: 'Reloaded: ' + tabs[0].url}
+  urls = [ ' * ' + ..url for tabs] * '\n'
+  sendResponse {errorCode: 200, content: "Reloading:\n#urls"}
+  for tab in tabs
+    chrome.tabs.reload tab.id, {}, ->
 
 
 reload_ext_or_app = (id, sendResponse) ->
