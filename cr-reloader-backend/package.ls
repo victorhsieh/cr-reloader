@@ -3,7 +3,7 @@ author:
   email: 'victor@csie.org'
 name: 'crx-reloader-backend'
 description: 'Crx Reloader Backend'
-version: '0.5.1'
+version: '0.6.0'
 repository:
   type: 'git'
   url: 'git://github.com/victorhsieh/crx-reloader.git'
