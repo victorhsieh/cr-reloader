@@ -1,12 +1,12 @@
 author:
   name: ['Victor Hsieh']
   email: 'victor@csie.org'
-name: 'crx-reloader'
-description: 'Crx Reloader'
+name: 'cr-reloader'
+description: 'Cr Reloader'
 version: '0.6.1'
 repository:
   type: 'git'
-  url: 'git://github.com/victorhsieh/crx-reloader.git'
+  url: 'git://github.com/victorhsieh/cr-reloader.git'
 scripts:
   prepublish: """
     ./node_modules/.bin/lsc -cj package.ls
