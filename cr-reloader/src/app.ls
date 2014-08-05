@@ -51,26 +51,28 @@ window.onload = ->
      '',
      response.content].join '\n'
 
-  writeResponse = (socketId, response) ->
+  writeResponse = (socketId, response, callback) ->
     console.log 'Sending back', socketId
-    info <- chrome.sockets.tcp.send socketId, stringToUint8Array(response).buffer
+    info <- tcp.send socketId, stringToUint8Array(response).buffer
     if info.resultCode != 0
-      console.error 'Failed to send to tcp socket, error code ' + info.resultCode
-    chrome.sockets.tcp.close socketId
+      msg = chrome.runtime.lastError.message
+      console.error "Failed to send to tcp socket: #{msg} (#{info.resultCode})"
+    callback socketId
 
   onAccept = (acceptInfo) ->
     console.log 'Accept', acceptInfo.clientSocketId
-    chrome.sockets.tcp.setPaused acceptInfo.clientSocketId, false
+    tcp.setPaused acceptInfo.clientSocketId, false
 
   onReceive = (info) ->
     console.log 'Receiving from', info.socketId
     data = arrayBufferToString info.data
     req = parseHTTPRequest data
     if req.pathname == '/favicon.ico'
-      writeResponse info.socketId, HTTPResponse({
+      socket <- writeResponse info.socketId, HTTPResponse({
         errorCode: 404,
         content: 'no favicon'
       })
+      tcp.close socket
       return
 
     backend = req.query.backend || CRX_RELOAD_EXTENSION_ID
@@ -81,20 +83,22 @@ window.onload = ->
           content: 'Did you install Crx Reloader Backend?\n' +
                    'https://chrome.google.com/webstore/detail/' +
                     CRX_RELOAD_EXTENSION_ID
+
     logToScreen 'Response content: [' + response.content + ']'
-    writeResponse info.socketId, HTTPResponse(response)
+    socket <- writeResponse info.socketId, HTTPResponse(response)
+    tcp.close socket
 
   start = ->
     info <- tcpServer.create {}
     serverSocketId := info.socketId
     host = _gel 'host'
-    chrome.sockets.tcp.onReceive.addListener onReceive
+    tcp.onReceive.addListener onReceive
     result <- tcpServer.listen info.socketId, host.value, PORT
     logToScreen 'Listening: ' + result
 
-    chrome.sockets.tcpServer.onAccept.addListener (info) ->
+    tcpServer.onAccept.addListener (info) ->
       onAccept info
-    chrome.sockets.tcpServer.onAcceptError.addListener (info) ->
+    tcpServer.onAcceptError.addListener (info) ->
       logToScreen "Accept error: socket: #{info.socketId} result: #{info.resultCode}"
 
   updateInterfaces = ->
