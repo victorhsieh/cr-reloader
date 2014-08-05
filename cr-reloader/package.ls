@@ -3,7 +3,7 @@ author:
   email: 'victor@csie.org'
 name: 'cr-reloader'
 description: 'Cr Reloader'
-version: '0.6.1'
+version: '0.7.0'
 repository:
   type: 'git'
   url: 'git://github.com/victorhsieh/cr-reloader.git'

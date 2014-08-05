@@ -1,17 +1,18 @@
 require! url
 
 const CRX_RELOAD_EXTENSION_ID = 'djacajifmnoecnnnpcgiilgnmobgnimn'
+const PORT = 24601
 
 _gel = -> document.getElementById it
 
 window.onload = ->
-  host = _gel 'host'
-  port = _gel 'port'
   restart = _gel 'restart'
   logger = _gel 'logger'
 
-  socket = chrome.experimental.socket || chrome.socket
-  var socketInfo
+  tcpServer = chrome.sockets.tcpServer
+  tcp = chrome.sockets.tcp
+
+  var serverSocketId
 
   stringToUint8Array = (string) ->
     buffer = new ArrayBuffer string.length
@@ -51,22 +52,23 @@ window.onload = ->
      response.content].join '\n'
 
   writeResponse = (socketId, response) ->
-    writeInfo <- socket.write socketId, stringToUint8Array(response).buffer
-    console.log 'WRITE', writeInfo
-    socket.destroy socketId
-    socket.accept socketInfo.socketId, onAccept
+    console.log 'Sending back', socketId
+    info <- chrome.sockets.tcp.send socketId, stringToUint8Array(response).buffer
+    if info.resultCode != 0
+      console.error 'Failed to send to tcp socket, error code ' + info.resultCode
+    chrome.sockets.tcp.close socketId
 
   onAccept = (acceptInfo) ->
-    console.log 'ACCEPT', acceptInfo
-    readFromSocket acceptInfo.socketId
+    console.log 'Accept', acceptInfo.clientSocketId
+    chrome.sockets.tcp.onReceive.addListener onReceive
+    chrome.sockets.tcp.setPaused acceptInfo.clientSocketId, false
 
-  readFromSocket = (socketId) ->
-    readInfo <- socket.read socketId
-    console.log 'READ', readInfo
-    data = arrayBufferToString readInfo.data
+  onReceive = (info) ->
+    console.log 'Receiving from', info.socketId
+    data = arrayBufferToString info.data
     req = parseHTTPRequest data
     if req.pathname == '/favicon.ico'
-      writeResponse socketId, HTTPResponse({
+      writeResponse info.socketId, HTTPResponse({
         errorCode: 404,
         content: 'no favicon'
       })
@@ -80,15 +82,20 @@ window.onload = ->
           content: 'Did you install Crx Reloader Backend?\n' +
                    'https://chrome.google.com/webstore/detail/' +
                     CRX_RELOAD_EXTENSION_ID
-    logToScreen response.content
-    writeResponse socketId, HTTPResponse(response)
+    logToScreen 'Response content: [' + response.content + ']'
+    writeResponse info.socketId, HTTPResponse(response)
 
   start = ->
-    _socketInfo <- socket.create 'tcp', {}
-    socketInfo := _socketInfo;
-    result <- socket.listen socketInfo.socketId, host.value, parseInt(port.value), 50
-    logToScreen 'LISTENING: ' + result
-    socket.accept socketInfo.socketId, onAccept
+    info <- tcpServer.create {}
+    serverSocketId := info.socketId
+    host = _gel 'host'
+    result <- tcpServer.listen info.socketId, host.value, PORT
+    logToScreen 'Listening: ' + result
+
+    chrome.sockets.tcpServer.onAccept.addListener (info) ->
+      onAccept info
+    chrome.sockets.tcpServer.onAcceptError.addListener (info) ->
+      logToScreen "Accept error: socket: #{info.socketId} result: #{info.resultCode}"
 
   updateInterfaces = ->
     interfaces <- socket.getNetworkList
@@ -104,8 +111,8 @@ window.onload = ->
     console.log msg
 
   restart.onclick = ->
-    console.log 'RESTARTING'
-    socket.destroy socketInfo.socketId
+    console.log 'Restarting'
+    tcpServer.disconnect serverSocketId
     start!
 
   start!
