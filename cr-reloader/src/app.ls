@@ -60,7 +60,6 @@ window.onload = ->
 
   onAccept = (acceptInfo) ->
     console.log 'Accept', acceptInfo.clientSocketId
-    chrome.sockets.tcp.onReceive.addListener onReceive
     chrome.sockets.tcp.setPaused acceptInfo.clientSocketId, false
 
   onReceive = (info) ->
@@ -89,6 +88,7 @@ window.onload = ->
     info <- tcpServer.create {}
     serverSocketId := info.socketId
     host = _gel 'host'
+    chrome.sockets.tcp.onReceive.addListener onReceive
     result <- tcpServer.listen info.socketId, host.value, PORT
     logToScreen 'Listening: ' + result
 
